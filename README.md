@@ -18,7 +18,7 @@ GitHub Actions workflows require AWS credentials to deploy infrastructure, but m
 
 ## What This Project Does
 
-Eliminates credential management through OIDC trust relationships that allow GitHub repositories to assume AWS roles directly. Generates deployment policies from JSON files and publishes role ARNs to SSM Parameter Store for service discovery.
+Reduces credential management overhead through OIDC trust relationships that allow GitHub repositories to assume AWS roles directly. Generates deployment policies from JSON files and publishes role ARNs to SSM Parameter Store for service discovery.
 
 - Creates IAM roles with repository-scoped OIDC trust policies for secure authentication
 - Generates deployment policies dynamically from JSON configuration files
@@ -46,6 +46,10 @@ Creates IAM roles with repository-scoped OIDC trust policies and publishes role 
 - Establishes consistent tagging and naming conventions across deployment infrastructure
 - Implements automated prerequisite validation and backend configuration management
 
+## GitHub Actions Integration
+
+Supports automated deployment through GitHub Actions using OIDC authentication with local-first configuration management. See [GitHub Actions documentation](docs/github-actions.md) for complete workflow setup and deployment patterns.
+
 ## Quick Start
 
 Basic deployment workflow:
@@ -64,11 +68,11 @@ Basic deployment workflow:
 ./scripts/list-deployed-resources.sh
 ```
 
-See [prerequisites documentation](docs/prerequisites.md) for detailed requirements, [troubleshooting guide](docs/troubleshooting.md) for common issues, [architecture documentation](docs/architecture.md) for system design and integration patterns, and [tagging documentation](docs/tags.md) for resource tagging strategy and cost allocation.
+See [prerequisites documentation](https://github.com/stephenabbot/foundation-iam-deploy-roles/blob/main/docs/prerequisites.md) for detailed requirements, [scripts documentation](https://github.com/stephenabbot/foundation-iam-deploy-roles/blob/main/docs/scripts.md) for available automation, [troubleshooting guide](https://github.com/stephenabbot/foundation-iam-deploy-roles/blob/main/docs/troubleshooting.md) for common issues, [architecture documentation](https://github.com/stephenabbot/foundation-iam-deploy-roles/blob/main/docs/architecture.md) for system design and integration patterns, and [tagging documentation](https://github.com/stephenabbot/foundation-iam-deploy-roles/blob/main/docs/tags.md) for resource tagging strategy and cost allocation.
 
 ## AWS Well-Architected Framework
 
-This project demonstrates alignment with the [AWS Well-Architected Framework](https://aws.amazon.com/blogs/apn/the-6-pillars-of-the-aws-well-architected-framework/):
+This project follows AWS Well-Architected Framework principles:
 
 ### Security
 
@@ -102,8 +106,7 @@ This project demonstrates alignment with the [AWS Well-Architected Framework](ht
 
 | Technology | Purpose | Implementation |
 |------------|---------|----------------|
-| Kiro CLI with Claude | AI-assisted development, design, and implementation | Project architecture design and code generation |
-| OpenTofu | Infrastructure as Code | Version 1.0+ with AWS provider ~5.0 for IAM resource management |
+| OpenTofu | Infrastructure as Code | Version 1.10.7 with AWS provider ~5.0 for IAM resource management |
 | AWS IAM | Role creation and policy management | Repository-scoped OIDC trust policies with least-privilege access |
 | AWS SSM Parameter Store | Role ARN publishing and service discovery | Predictable parameter paths at `/deployment-roles/{project}/role-arn` |
 | GitHub Actions OIDC | Secure authentication without long-lived credentials | Trust relationships for direct role assumption from GitHub workflows |

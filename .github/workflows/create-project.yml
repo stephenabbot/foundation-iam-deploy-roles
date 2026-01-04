@@ -1,0 +1,38 @@
+name: create-project
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_name:
+        description: 'Name of the project to create'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create project
+        run: ./scripts/create-project.sh "${{ github.event.inputs.project_name }}"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat: Add project ${{ github.event.inputs.project_name }}"
+          title: "Add project: ${{ github.event.inputs.project_name }}"
+          body: |
+            Automated project creation for: ${{ github.event.inputs.project_name }}
+            
+            - Created project directory structure
+            - Added default deployment policy template
+            
+            Please review and customize the deployment policy before merging.
+          branch: "create-project/${{ github.event.inputs.project_name }}"
