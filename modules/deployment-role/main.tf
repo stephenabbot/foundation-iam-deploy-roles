@@ -30,8 +30,9 @@ resource "aws_iam_role" "deployment" {
   tags               = var.tags
 }
 
-# Trust policy allowing GitHub Actions to assume role
+# Trust policy allowing GitHub Actions and local development to assume role
 data "aws_iam_policy_document" "trust_policy" {
+  # Statement 1: Allow GitHub Actions OIDC
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRoleWithWebIdentity"]
@@ -51,6 +52,17 @@ data "aws_iam_policy_document" "trust_policy" {
       test     = "StringLike"
       variable = "${local.oidc_provider_url}:sub"
       values   = ["repo:${var.github_repository}:*"]
+    }
+  }
+
+  # Statement 2: Allow local development user
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/a_dev"]
     }
   }
 }

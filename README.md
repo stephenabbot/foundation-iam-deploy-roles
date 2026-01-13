@@ -57,6 +57,28 @@ This project creates and manages AWS resources that enable secure GitHub Actions
 ./scripts/deploy.sh
 ```
 
+### Local Development Role Testing
+After deploying roles, you can test role assumption locally to verify GitHub Actions will work correctly:
+
+```bash
+# Test assuming a deployment role locally
+PROJECT_NAME="my-project"
+ROLE_ARN=$(aws ssm get-parameter --name "/deployment-roles/${PROJECT_NAME}/role-arn" --query 'Parameter.Value' --output text)
+
+# Assume the role (requires deployment to include your IAM user in trust policy)
+aws sts assume-role --role-arn "$ROLE_ARN" --role-session-name "local-test"
+
+# Use temporary credentials to test permissions
+export AWS_ACCESS_KEY_ID=<AccessKeyId>
+export AWS_SECRET_ACCESS_KEY=<SecretAccessKey>  
+export AWS_SESSION_TOKEN=<SessionToken>
+
+# Verify role assumption worked
+aws sts get-caller-identity
+```
+
+**Security Note**: Deployment roles include both GitHub Actions OIDC and your local IAM user (`a_dev`) in their trust policies, enabling local testing while maintaining GitHub Actions functionality.
+
 ### GitHub Actions (Automated)
 The project includes three GitHub Actions workflows for automated deployment and validation. See [docs/prerequisites.md](docs/prerequisites.md) for setup requirements and [docs/troubleshooting.md](docs/troubleshooting.md) for common issues.
 

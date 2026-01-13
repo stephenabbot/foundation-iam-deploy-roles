@@ -134,6 +134,68 @@ tofu force-unlock <LOCK_ID>
 
 ## Role Assumption Failures
 
+### Local Development Role Testing
+
+**Purpose**: Test deployment role assumption locally before GitHub Actions deployment to verify permissions and trust policy configuration.
+
+**Prerequisites**:
+- Deployment roles deployed with updated trust policy including your IAM user
+- AWS CLI configured with your `a_dev` user credentials
+- Project role ARN available in SSM Parameter Store
+
+**Testing Process**:
+```bash
+# Get the role ARN for your project
+PROJECT_NAME="private-splunk-cw-firehose-to-splunk"
+ROLE_ARN=$(aws ssm get-parameter --name "/deployment-roles/${PROJECT_NAME}/role-arn" --query 'Parameter.Value' --output text)
+
+# Test role assumption
+CREDS=$(aws sts assume-role --role-arn "$ROLE_ARN" --role-session-name "local-test" --output json)
+
+# Extract temporary credentials
+export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
+export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r '.Credentials.SecretAccessKey')
+export AWS_SESSION_TOKEN=$(echo "$CREDS" | jq -r '.Credentials.SessionToken')
+
+# Verify assumption worked
+aws sts get-caller-identity
+
+# Test permissions (example)
+aws s3 ls  # Should work if policy allows S3 access
+
+# Clean up credentials when done
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
+```
+
+**Common Issues**:
+
+1. **Trust Policy Not Updated**
+   ```bash
+   # Error: "User: arn:aws:iam::ACCOUNT:user/a_dev is not authorized to perform: sts:AssumeRole"
+   # Solution: Ensure deployment roles have been redeployed with updated trust policy
+   ./scripts/deploy.sh
+   ```
+
+2. **Wrong IAM User**
+   ```bash
+   # Verify you're using the correct IAM user
+   aws sts get-caller-identity
+   # Should show: "arn:aws:iam::ACCOUNT:user/a_dev"
+   ```
+
+3. **Role ARN Not Found**
+   ```bash
+   # Verify role exists and parameter is published
+   aws ssm get-parameter --name "/deployment-roles/${PROJECT_NAME}/role-arn"
+   aws iam get-role --role-name "gharole-${PROJECT_NAME}-prd"
+   ```
+
+**Security Considerations**:
+- Local testing uses the same permissions as GitHub Actions workflows
+- Temporary credentials expire automatically (default 1 hour)
+- Trust policy includes both OIDC (GitHub Actions) and IAM user (local testing)
+- Use this for development and verification only, not production deployments
+
 ### Trust Policy Issues
 
 **Problem**: GitHub Actions cannot assume deployment role
