@@ -2,8 +2,41 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "CallerIdentity",
       "Effect": "Allow",
-      "Action": "*",
+      "Action": "sts:GetCallerIdentity",
+      "Resource": "*"
+    },
+    {
+      "Sid": "SSMInfraParams",
+      "Effect": "Allow",
+      "Action": "ssm:GetParameter",
+      "Resource": "arn:aws:ssm:us-east-1:694394480102:parameter/static-website/infrastructure/denverbytes.com/*"
+    },
+    {
+      "Sid": "S3BucketList",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:ListBucketVersions"
+      ],
+      "Resource": "arn:aws:s3:::denverbytes-com-static-prd"
+    },
+    {
+      "Sid": "S3ObjectOps",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion"
+      ],
+      "Resource": "arn:aws:s3:::denverbytes-com-static-prd/*"
+    },
+    {
+      "Sid": "CloudFrontInvalidation",
+      "Effect": "Allow",
+      "Action": "cloudfront:CreateInvalidation",
       "Resource": "*"
     }
   ]

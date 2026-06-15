@@ -2,9 +2,48 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "CallerIdentity",
       "Effect": "Allow",
-      "Action": "*",
+      "Action": "sts:GetCallerIdentity",
       "Resource": "*"
+    },
+    {
+      "Sid": "S3BucketManagement",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:ListBucket",
+        "s3:PutEncryptionConfiguration",
+        "s3:PutBucketPublicAccessBlock",
+        "s3:PutBucketTagging",
+        "s3:PutBucketPolicy"
+      ],
+      "Resource": "arn:aws:s3:::splunk-installer-694394480102-us-east-1"
+    },
+    {
+      "Sid": "S3ObjectOps",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::splunk-installer-694394480102-us-east-1/*"
+    },
+    {
+      "Sid": "SSMInstallerParams",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:PutParameter",
+        "ssm:GetParameter"
+      ],
+      "Resource": "arn:aws:ssm:us-east-1:694394480102:parameter/splunk-s3-installer/*"
+    },
+    {
+      "Sid": "SSMParameterTags",
+      "Effect": "Allow",
+      "Action": "ssm:AddTagsToResource",
+      "Resource": "arn:aws:ssm:us-east-1:694394480102:parameter/splunk-s3-installer/*"
     }
   ]
 }
