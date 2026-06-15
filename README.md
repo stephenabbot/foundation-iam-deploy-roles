@@ -82,7 +82,7 @@ aws sts get-caller-identity
 ### GitHub Actions (Automated)
 The project includes three GitHub Actions workflows for automated deployment and validation. See [docs/prerequisites.md](docs/prerequisites.md) for setup requirements and [docs/troubleshooting.md](docs/troubleshooting.md) for common issues.
 
-- **Deploy** - Automatically deploys on push to main branch
+- **Deploy** - Manually triggered deployment workflow
 - **Destroy** - Manual workflow to destroy all resources (requires confirmation)
 - **Validate Foundation** - Tests OIDC authentication and foundation access
 

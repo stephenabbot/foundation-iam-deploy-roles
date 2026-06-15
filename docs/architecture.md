@@ -25,7 +25,7 @@ This project operates within a layered infrastructure ecosystem designed for sec
 - Application-specific IAM policies and resources
 
 ### Layer 4: Application Content
-**[website_denverbytes_com](https://github.com/stephenabbot/website_denverbytes_com)** - Static website content and build process
+**[website-denverbytes-com](https://github.com/stephenabbot/website-denverbytes-com)** - Static website content and build process
 - Static site generation and content management
 - Deployment workflows using roles from Layer 2
 - Content delivery through infrastructure from Layer 3
