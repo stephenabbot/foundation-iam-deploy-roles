@@ -2,9 +2,137 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "CallerIdentity",
       "Effect": "Allow",
-      "Action": "*",
+      "Action": "sts:GetCallerIdentity",
       "Resource": "*"
+    },
+    {
+      "Sid": "SSMSplunkCredentials",
+      "Effect": "Allow",
+      "Action": "ssm:GetParameter",
+      "Resource": [
+        "arn:aws:ssm:us-east-1:694394480102:parameter/ephemeral-splunk/cloudfront-endpoint",
+        "arn:aws:ssm:us-east-1:694394480102:parameter/ephemeral-splunk/hec-token"
+      ]
+    },
+    {
+      "Sid": "CloudFormationStack",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:CreateStack",
+        "cloudformation:UpdateStack",
+        "cloudformation:DeleteStack",
+        "cloudformation:DescribeStacks",
+        "cloudformation:DescribeStackEvents",
+        "cloudformation:GetTemplate",
+        "cloudformation:ValidateTemplate",
+        "cloudformation:CreateChangeSet",
+        "cloudformation:DescribeChangeSet",
+        "cloudformation:ExecuteChangeSet",
+        "cloudformation:DeleteChangeSet",
+        "cloudformation:ListStackResources",
+        "cloudformation:GetStackPolicy",
+        "cloudformation:ListChangeSets"
+      ],
+      "Resource": "arn:aws:cloudformation:us-east-1:694394480102:stack/firehose-setup-stack/*"
+    },
+    {
+      "Sid": "CloudFormationValidate",
+      "Effect": "Allow",
+      "Action": "cloudformation:ValidateTemplate",
+      "Resource": "*"
+    },
+    {
+      "Sid": "LambdaTransformFunction",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateFunction",
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
+        "lambda:DeleteFunction",
+        "lambda:GetFunctionCodeSigningConfig",
+        "lambda:ListVersionsByFunction",
+        "lambda:AddPermission",
+        "lambda:RemovePermission",
+        "lambda:GetPolicy",
+        "lambda:TagResource",
+        "lambda:ListTags",
+        "lambda:UntagResource"
+      ],
+      "Resource": "arn:aws:lambda:us-east-1:694394480102:function:firehose-setup-stack-transform"
+    },
+    {
+      "Sid": "FirehoseDeliveryStream",
+      "Effect": "Allow",
+      "Action": [
+        "firehose:CreateDeliveryStream",
+        "firehose:DescribeDeliveryStream",
+        "firehose:UpdateDestination",
+        "firehose:DeleteDeliveryStream",
+        "firehose:TagDeliveryStream",
+        "firehose:ListTagsForDeliveryStream",
+        "firehose:UntagDeliveryStream"
+      ],
+      "Resource": "arn:aws:firehose:us-east-1:694394480102:deliverystream/firehose-setup-stack-firehose"
+    },
+    {
+      "Sid": "CloudWatchLogsFirehoseLogGroup",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:DeleteLogGroup",
+        "logs:DescribeLogGroups",
+        "logs:PutRetentionPolicy",
+        "logs:DeleteRetentionPolicy",
+        "logs:ListTagsLogGroup",
+        "logs:TagLogGroup",
+        "logs:UntagLogGroup",
+        "logs:ListTagsForResource",
+        "logs:TagResource",
+        "logs:UntagResource"
+      ],
+      "Resource": "arn:aws:logs:us-east-1:694394480102:log-group:/aws/kinesisfirehose/firehose-setup-stack*"
+    },
+    {
+      "Sid": "CloudWatchLogsSubscriptionFilters",
+      "Effect": "Allow",
+      "Action": [
+        "logs:PutSubscriptionFilter",
+        "logs:DeleteSubscriptionFilter",
+        "logs:DescribeSubscriptionFilters"
+      ],
+      "Resource": "arn:aws:logs:us-east-1:694394480102:log-group:/aws/lambda/use1-demo-heartbeat"
+    },
+    {
+      "Sid": "CloudWatchDataFreshnessAlarm",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:ListTagsForResource",
+        "cloudwatch:TagResource",
+        "cloudwatch:UntagResource"
+      ],
+      "Resource": "arn:aws:cloudwatch:us-east-1:694394480102:alarm:firehose-setup-stack-*"
+    },
+    {
+      "Sid": "IAMPassRoleToStack",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::694394480102:role/firehose-setup-*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": [
+            "lambda.amazonaws.com",
+            "firehose.amazonaws.com",
+            "logs.us-east-1.amazonaws.com"
+          ]
+        }
+      }
     }
   ]
 }

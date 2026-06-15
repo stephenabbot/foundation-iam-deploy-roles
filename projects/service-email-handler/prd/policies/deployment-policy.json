@@ -2,9 +2,273 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "CallerIdentity",
       "Effect": "Allow",
-      "Action": "*",
+      "Action": "sts:GetCallerIdentity",
       "Resource": "*"
+    },
+    {
+      "Sid": "TerraformStateBackend",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::terraform-state-694394480102-us-east-1",
+        "arn:aws:s3:::terraform-state-694394480102-us-east-1/*"
+      ]
+    },
+    {
+      "Sid": "TerraformLockTable",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+      ],
+      "Resource": "arn:aws:dynamodb:us-east-1:694394480102:table/terraform-locks-694394480102-us-east-1"
+    },
+    {
+      "Sid": "S3EmailBucketManagement",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:ListBucket",
+        "s3:Get*",
+        "s3:PutBucketPublicAccessBlock",
+        "s3:PutEncryptionConfiguration",
+        "s3:PutLifecycleConfiguration",
+        "s3:PutBucketNotification",
+        "s3:PutBucketPolicy",
+        "s3:DeleteBucketPolicy",
+        "s3:PutBucketTagging"
+      ],
+      "Resource": "arn:aws:s3:::service-email-handler-694394480102-us-east-1"
+    },
+    {
+      "Sid": "S3EmailBucketObjects",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::service-email-handler-694394480102-us-east-1/*"
+    },
+    {
+      "Sid": "DynamoDBConversationTable",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:CreateTable",
+        "dynamodb:DescribeTable",
+        "dynamodb:UpdateTable",
+        "dynamodb:DeleteTable",
+        "dynamodb:DescribeContinuousBackups",
+        "dynamodb:DescribeTimeToLive",
+        "dynamodb:ListTagsOfResource",
+        "dynamodb:TagResource",
+        "dynamodb:UntagResource"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:us-east-1:694394480102:table/service-email-handler-prd-conversations",
+        "arn:aws:dynamodb:us-east-1:694394480102:table/service-email-handler-prd-conversations/index/*"
+      ]
+    },
+    {
+      "Sid": "SQSQueues",
+      "Effect": "Allow",
+      "Action": [
+        "sqs:CreateQueue",
+        "sqs:DeleteQueue",
+        "sqs:GetQueueAttributes",
+        "sqs:SetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ListQueueTags",
+        "sqs:TagQueue",
+        "sqs:UntagQueue"
+      ],
+      "Resource": "arn:aws:sqs:us-east-1:694394480102:service-email-handler-prd-*"
+    },
+    {
+      "Sid": "LambdaFunctions",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateFunction",
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
+        "lambda:DeleteFunction",
+        "lambda:GetFunctionCodeSigningConfig",
+        "lambda:ListVersionsByFunction",
+        "lambda:AddPermission",
+        "lambda:RemovePermission",
+        "lambda:GetPolicy",
+        "lambda:TagResource",
+        "lambda:ListTags",
+        "lambda:UntagResource"
+      ],
+      "Resource": "arn:aws:lambda:us-east-1:694394480102:function:service-email-handler-prd-*"
+    },
+    {
+      "Sid": "LambdaEventSourceMappings",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateEventSourceMapping",
+        "lambda:GetEventSourceMapping",
+        "lambda:UpdateEventSourceMapping",
+        "lambda:DeleteEventSourceMapping",
+        "lambda:ListEventSourceMappings"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "IAMLambdaRoleManagement",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:GetRole",
+        "iam:UpdateRole",
+        "iam:DeleteRole",
+        "iam:PutRolePolicy",
+        "iam:GetRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:ListRoleTags"
+      ],
+      "Resource": "arn:aws:iam::694394480102:role/service-email-handler-*"
+    },
+    {
+      "Sid": "IAMLambdaPassRole",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::694394480102:role/service-email-handler-*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "lambda.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Sid": "SESConfiguration",
+      "Effect": "Allow",
+      "Action": [
+        "ses:VerifyDomainIdentity",
+        "ses:GetIdentityVerificationAttributes",
+        "ses:DeleteIdentity",
+        "ses:VerifyDomainDkim",
+        "ses:GetIdentityDkimAttributes",
+        "ses:SetIdentityMailFromDomain",
+        "ses:GetIdentityMailFromDomainAttributes",
+        "ses:CreateReceiptRuleSet",
+        "ses:DescribeReceiptRuleSet",
+        "ses:DeleteReceiptRuleSet",
+        "ses:SetActiveReceiptRuleSet",
+        "ses:DescribeActiveReceiptRuleSet",
+        "ses:CreateReceiptRule",
+        "ses:DescribeReceiptRule",
+        "ses:UpdateReceiptRule",
+        "ses:DeleteReceiptRule",
+        "ses:SetIdentityFeedbackForwardingEnabled"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "Route53DNSRecords",
+      "Effect": "Allow",
+      "Action": [
+        "route53:ChangeResourceRecordSets",
+        "route53:ListResourceRecordSets",
+        "route53:GetHostedZone"
+      ],
+      "Resource": [
+        "arn:aws:route53:::hostedzone/Z01641912OF9GBHJ1EYKE",
+        "arn:aws:route53:::hostedzone/Z05729222PIN01TVAQMRE"
+      ]
+    },
+    {
+      "Sid": "Route53GetChange",
+      "Effect": "Allow",
+      "Action": "route53:GetChange",
+      "Resource": "arn:aws:route53:::change/*"
+    },
+    {
+      "Sid": "SNSAlerts",
+      "Effect": "Allow",
+      "Action": [
+        "sns:CreateTopic",
+        "sns:GetTopicAttributes",
+        "sns:SetTopicAttributes",
+        "sns:DeleteTopic",
+        "sns:Subscribe",
+        "sns:GetSubscriptionAttributes",
+        "sns:Unsubscribe",
+        "sns:ListSubscriptionsByTopic",
+        "sns:TagResource",
+        "sns:ListTagsForResource",
+        "sns:UntagResource"
+      ],
+      "Resource": "arn:aws:sns:us-east-1:694394480102:service-email-handler-prd-*"
+    },
+    {
+      "Sid": "CloudWatchLogGroups",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:DeleteLogGroup",
+        "logs:DescribeLogGroups",
+        "logs:PutRetentionPolicy",
+        "logs:DeleteRetentionPolicy",
+        "logs:ListTagsLogGroup",
+        "logs:TagLogGroup",
+        "logs:UntagLogGroup",
+        "logs:ListTagsForResource",
+        "logs:TagResource",
+        "logs:UntagResource"
+      ],
+      "Resource": [
+        "arn:aws:logs:us-east-1:694394480102:log-group:/aws/lambda/service-email-handler-prd-*",
+        "arn:aws:logs:us-east-1:694394480102:log-group:/email-handler/*"
+      ]
+    },
+    {
+      "Sid": "CloudWatchAlarms",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:ListTagsForResource",
+        "cloudwatch:TagResource",
+        "cloudwatch:UntagResource"
+      ],
+      "Resource": "arn:aws:cloudwatch:us-east-1:694394480102:alarm:service-email-handler-prd-*"
+    },
+    {
+      "Sid": "SSMOwnedParameters",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:PutParameter",
+        "ssm:GetParameter",
+        "ssm:DeleteParameter",
+        "ssm:AddTagsToResource",
+        "ssm:ListTagsForResource"
+      ],
+      "Resource": "arn:aws:ssm:us-east-1:694394480102:parameter/service-email-handler/*"
+    },
+    {
+      "Sid": "SSMReadHostedZoneId",
+      "Effect": "Allow",
+      "Action": "ssm:GetParameter",
+      "Resource": "arn:aws:ssm:us-east-1:694394480102:parameter/static-website/infrastructure/*/hosted-zone-id"
     }
   ]
 }
