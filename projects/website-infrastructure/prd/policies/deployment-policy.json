@@ -4,7 +4,10 @@
     {
       "Sid": "CallerIdentity",
       "Effect": "Allow",
-      "Action": "sts:GetCallerIdentity",
+      "Action": [
+        "sts:GetCallerIdentity",
+        "iam:ListAccountAliases"
+      ],
       "Resource": "*"
     },
     {
