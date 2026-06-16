@@ -157,6 +157,15 @@
         "ssm:RemoveTagsFromResource"
       ],
       "Resource": "arn:aws:ssm:us-east-1:694394480102:parameter/static-website/infrastructure/*"
+    },
+    {
+      "Sid": "SSMFoundationReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter",
+        "ssm:GetParameters"
+      ],
+      "Resource": "arn:aws:ssm:us-east-1:694394480102:parameter/terraform/foundation/*"
     }
   ]
 }

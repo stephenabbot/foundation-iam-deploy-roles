@@ -295,3 +295,37 @@ The architecture implements multiple security layers:
 - **Access Control**: Role-based access with repository-level granularity
 - **Data Protection**: State files encrypted at rest and in transit
 - **Change Management**: Infrastructure as Code with version control and approval workflows
+
+## Dual Deployment Path Design
+
+### Intent
+
+Each project's deployment role (`gharole-{project}-{env}`) is designed to support two deployment paths using the same deploy script and the same role:
+
+1. **Local development** — a privileged developer (`a_dev`) runs `scripts/deploy.sh` directly with their own credentials. No role assumption occurs. The script uses whatever credentials are in the environment.
+
+2. **GitHub Actions** — the workflow sets up credentials via OIDC (assuming `gharole-{project}-{env}`) before calling the same `scripts/deploy.sh`. The script is unaware of the difference.
+
+This keeps the deploy script as a single source of truth. The workflow's only added responsibility is credential setup.
+
+### Transition Path to Pipeline-Only Deployment
+
+The trust policy for each role allows both GitHub Actions OIDC and the `a_dev` user to assume the role. This is intentional and supports a controlled transition:
+
+- **Phase 1 (current):** `a_dev` deploys directly. Fast iteration, no role gymnastics required.
+- **Phase 2 (when required):** Revoke `a_dev`'s direct resource permissions for the relevant services at the IAM level. Local deployment then requires explicitly assuming the project role first. The script and the role do not change — enforcement is at the IAM layer.
+
+This means the transition from developer-friendly to pipeline-enforced PoLP requires only an IAM permission change, not a code change.
+
+### Why Deployment Policies Must Include Foundation SSM Read
+
+The deploy script reads two foundation SSM parameters to configure the Terraform backend before any resource operations:
+
+- `/terraform/foundation/s3-state-bucket`
+- `/terraform/foundation/dynamodb-lock-table`
+
+These parameters are written by `foundation-terraform-bootstrap` and are not project-specific. However, because the deploy script runs under the project deployment role in GitHub Actions, the role's policy must include read access to these parameters.
+
+**Without this permission**, the role can assume successfully but the script fails immediately at backend configuration — before any infrastructure work begins. The error is not obvious from the Terraform output alone.
+
+All project deployment policies in this repository should therefore include an `SSMFoundationReadOnly` statement scoped to `parameter/terraform/foundation/*` with `ssm:GetParameter` and `ssm:GetParameters`.
