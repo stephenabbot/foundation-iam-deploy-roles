@@ -148,13 +148,18 @@
       "Resource": "*"
     },
     {
+      "Sid": "SSMDescribeParameters",
+      "Effect": "Allow",
+      "Action": "ssm:DescribeParameters",
+      "Resource": "*"
+    },
+    {
       "Sid": "SSMInfraParameters",
       "Effect": "Allow",
       "Action": [
         "ssm:PutParameter",
         "ssm:GetParameter",
         "ssm:GetParameters",
-        "ssm:DescribeParameters",
         "ssm:DeleteParameter",
         "ssm:AddTagsToResource",
         "ssm:ListTagsForResource",
